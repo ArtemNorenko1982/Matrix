@@ -1,5 +1,6 @@
 ﻿using Matrix.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace Matrix.WebApp.Controllers
 {
@@ -8,7 +9,8 @@ namespace Matrix.WebApp.Controllers
     public class MatrixController : ControllerBase
     {
         private readonly IRotationService rotationService;
-        private int[,] incommingMatrix;
+        private static int[,] incommingMatrix;
+
         public MatrixController(IRotationService rotationService)
         {
             this.rotationService = rotationService;
@@ -41,18 +43,11 @@ namespace Matrix.WebApp.Controllers
         }
 
         [HttpPost("store")]
-        public IActionResult StoreMatrix(FromBodyAttribute bodyAttribute)
+        public IActionResult StoreMatrix(string incomingMatrix)
         {
             //TODO:
-            //incommingMatrix = bodyAttribute --> getMatrix()
-            return Ok();
-        }
-
-        [HttpPost("generate")]
-        public IActionResult GenerateRandomMatrix(FromBodyAttribute bodyAttribute)
-        {
-            //TODO:
-            //incommingMatrix = bodyAttribute --> getMatrix()
+            var t = incomingMatrix;
+            //incommingMatrix = incomingMatrix;
             return Ok();
         }
     }
