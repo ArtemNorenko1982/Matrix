@@ -1,6 +1,7 @@
 using Matrix.WebApp.Registrations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -14,13 +15,18 @@ namespace Matrix
         {
             Configuration = configuration;
         }
-        // This method gets called by the runtime. Use this method to add services to the container.
-        // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(parameter => Configuration);
-            Container.RegisterModules(services);
             services.AddMvc();
+            Container.RegisterModules(services);
+
+            services.AddSpaStaticFiles(conf =>
+            {
+                conf.RootPath = "ClientApp/matrix/build";
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -31,7 +37,21 @@ namespace Matrix
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc();
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseSpaStaticFiles();
+            app.UseRouting();
+            app.UseEndpoints(endpoints => endpoints.MapControllerRoute(
+                name: "default",
+                pattern: "{controller}/{action}/{id?}"));
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "ClientApp/matrix";
+                if (env.IsDevelopment())
+                {
+                    spa.UseReactDevelopmentServer(npmScript: "start");
+                }
+            });
         }
     }
 }
