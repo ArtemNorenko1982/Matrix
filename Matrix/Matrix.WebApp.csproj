@@ -11,11 +11,14 @@
   <ItemGroup>
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Autofac.WebApi2" Version="5.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices" Version="3.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="3.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Matrix.Common\Matrix.Common.csproj" />
+    <ProjectReference Include="..\Matrix.Core\Matrix.Core.csproj" />
   </ItemGroup>
 
 </Project>
