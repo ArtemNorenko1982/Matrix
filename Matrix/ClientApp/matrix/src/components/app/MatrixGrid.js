@@ -30,29 +30,32 @@ export class MatrixGrid extends Component {
         );
     }
 
-    async rotateClockWise() {
+    rotateClockWise = async () => {
         const response = await fetch('api\\matrix\\clockwise-rotation');
-        const data = await response.json();
+        var data = await response.json();
         this.setState({ testMatrix: data, loading: false });
     }
 
-    async rotateAntiClockWise() {
+    rotateAntiClockWise = async () => {
         const response = await fetch('api\\matrix\\anti-clockwise-rotation');
-        const data = await response.json();
+        var data = await response.json();
         this.setState({ testMatrix: data, loading: false });
     }
 
     generate = () => {
         var customMatrix = [
-            [1, 2, 3],
-            [4, 5, 6],
-            [7, 8, 9],
+            [ 1,  2,  3,  4,  5,  6],
+            [ 7,  8,  9, 10, 11, 12],
+            [13, 14, 15, 16, 17, 18],
+            [19, 20, 21, 22, 23, 24],
+            [25, 26, 27, 28, 29, 30],
+            [31, 32, 33, 34, 35, 36]
         ];
         this.setState({ testMatrix: customMatrix, loading: false });
-        this.post();
+        this.post(customMatrix);
     }
 
-    async post() {
+    async post(matrix) {
         var result = await fetch('api\\matrix\\store',
             {
                 method: 'POST',
@@ -60,7 +63,7 @@ export class MatrixGrid extends Component {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ incomingMatrix: this.state.incomingMatrix })
+                body: JSON.stringify({matrix: matrix})
             })
             .then(res => (res.ok ? res : Promise.reject(res)))
             .then(res => res.json());
