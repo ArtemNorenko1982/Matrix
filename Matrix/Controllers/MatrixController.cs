@@ -1,6 +1,8 @@
-﻿using Matrix.Core.Interfaces;
+﻿using Matrix.Common.Extensions;
+using Matrix.Common.Helpers;
+using Matrix.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
 
 namespace Matrix.WebApp.Controllers
 {
@@ -25,7 +27,7 @@ namespace Matrix.WebApp.Controllers
                 return BadRequest("Invalid matrix data");
             }
 
-            var rotationResult = rotationService.ClockwiseMatrixRotation(incommingMatrix);
+            var rotationResult = JsonConvert.SerializeObject(rotationService.ClockwiseMatrixRotation(incommingMatrix));
             return Ok(rotationResult);
         }
 
@@ -38,17 +40,21 @@ namespace Matrix.WebApp.Controllers
                 return BadRequest("Invalid matrix data");
             }
 
-            var rotationResult = rotationService.ClockwiseMatrixRotation(incommingMatrix);
+            var rotationResult = JsonConvert.SerializeObject(rotationService.AnticlockwiseMatrixRotation(incommingMatrix));
             return Ok(rotationResult);
         }
 
         [HttpPost("store")]
-        public IActionResult StoreMatrix(string incomingMatrix)
+        public IActionResult StoreMatrix([FromBody] BodyHelper bodyData)
         {
-            //TODO:
-            var t = incomingMatrix;
-            //incommingMatrix = incomingMatrix;
-            return Ok();
+            var parsedData = bodyData.matrix.ConvertToArray();
+            if (parsedData == null)
+            {
+                return BadRequest("Invalid input matrix data");
+            }
+
+            incommingMatrix = parsedData;
+            return Ok(true);
         }
     }
 }
