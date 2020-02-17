@@ -44,8 +44,8 @@ export class MatrixGrid extends Component {
 
     generate = () => {
         var customMatrix = [
-            [ 1,  2,  3,  4,  5,  6],
-            [ 7,  8,  9, 10, 11, 12],
+            [1, 2, 3, 4, 5, 6],
+            [7, 8, 9, 10, 11, 12],
             [13, 14, 15, 16, 17, 18],
             [19, 20, 21, 22, 23, 24],
             [25, 26, 27, 28, 29, 30],
@@ -63,10 +63,19 @@ export class MatrixGrid extends Component {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({matrix: matrix})
+                body: JSON.stringify({ matrix: matrix })
             })
             .then(res => (res.ok ? res : Promise.reject(res)))
             .then(res => res.json());
         console.log(result);
+    }
+
+    //demo
+    load() {
+        alert("Note - only full version allows you to load matrix from external source.");
+    }
+
+    export() {
+        alert("Note - only full version allows you to export matrix data.");
     }
 }
