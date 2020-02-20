@@ -6,7 +6,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-      <h2>        Matrix Rotation App      </h2>
+        <h2>Square Matrix Rotation App</h2>
         <MatrixGrid />
       </header>
     </div>
