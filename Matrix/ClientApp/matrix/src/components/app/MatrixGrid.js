@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { CSVLink, CSVDownload } from "react-csv";
+import { CSVLink } from "react-csv";
+import CSVReader from "react-csv-reader";
 import './MatrixGrid.css'
 export class MatrixGrid extends Component {
 
@@ -7,6 +8,11 @@ export class MatrixGrid extends Component {
         defaultMatrixRowCount: Number,
         defaultMatrixColCount: Number
     };
+
+    parseOptions = {
+        dynamicTyping: true,
+        skipEmptyLines: true
+    }
 
     constructor(props) {
         super(props);
@@ -25,37 +31,41 @@ export class MatrixGrid extends Component {
         return (
             <div>
                 <form id="matrixItem">
-                    <div>
-                        <input id="r" type="Number" defaultValue={this.state.row} onChange={this.handleRowCount}></input> x <input id="c" type="Number" defaultValue={this.state.col} onChange={this.handleColCount}></input>
+                    <div className="matrixItemContent">
+                        {this.state.testMatrix.map((row, item) =>
+                            (<div id={item} key={item}>
+                                {row.map((col, element) => <span key={element}> | {col} | </span>)}
+                            </div>))
+                        }
                     </div>
-                    {this.state.testMatrix.map((row, item) =>
-                        (<div id={item} key={item}>
-                            {row.map((col, element) => <span key={element}> | {col} | </span>)}
-                        </div>))
-                    }
                 </form>
                 <br></br>
                 <div>
-                    <button className="btn btn-primary" onClick={this.load}>Load from csv</button>
-                    <button className="btn btn-primary" onClick={this.generate}>Generate random square matrix</button>
+                    <button className="btn btn-primary" onClick={this.generate}>Generate matrix</button>
+                    <a href="#" className="btn">
+                        <input id="r" type="Number" defaultValue={this.state.row} value={this.state.col} max={10} min={2} onChange={this.handleRowColCount}></input> x <input id="c" type="Number" defaultValue={this.state.col} value={this.state.col} max={10} min={2} onChange={this.handleRowColCount}></input>
+                    </a>
                     <button className="btn btn-primary" onClick={this.rotateClockWise}>Rotate clock wise</button>
                     <button className="btn btn-primary" onClick={this.rotateAntiClockWise}>Rotate anti clockwise</button>
-                    <CSVLink className="btn btn-primary" filename={"matrix.csv"} data={this.state.testMatrix}>export</CSVLink>
+                    <CSVLink className="btn btn-primary" filename={"matrix.csv"} data={this.state.testMatrix}>Export</CSVLink>
                 </div>
+                <CSVReader label="Load from *.csv " inputId={"csvMatrix"} onFileLoaded={this.handleFileData} parseOptions={this.parseOptions} />
             </div>
         );
     }
 
     rotateClockWise = async () => {
-        const response = await fetch('api\\matrix\\clockwise-rotation');
-        var data = await response.json();
-        this.setState({ testMatrix: data, loading: false });
+        await fetch('api\\matrix\\clockwise-rotation')
+            .then(res => (res.ok ? res : Promise.reject(res)))
+            .then(res => res.json())
+            .then(res => this.setState({ testMatrix: res, loading: false }));
     }
 
     rotateAntiClockWise = async () => {
-        const response = await fetch('api\\matrix\\anti-clockwise-rotation');
-        var data = await response.json();
-        this.setState({ testMatrix: data, loading: false });
+        await fetch('api\\matrix\\anti-clockwise-rotation')
+            .then(res => (res.ok ? res : Promise.reject(res)))
+            .then(res => res.json())
+            .then(res => this.setState({ testMatrix: res, loading: false }));
     }
 
     generate = () => {
@@ -63,8 +73,8 @@ export class MatrixGrid extends Component {
         var columns = this.state.col;
         if (this.isUserDataValid(rows, columns) === true) {
             var customMatrix = this.buildRandomMatrix(rows, columns);
-            this.setState({ testMatrix: customMatrix, loading: false });
             this.post(customMatrix);
+            this.setState({ testMatrix: customMatrix, loading: false });
         }
         else {
             alert("Please, use square matrix, at least 2x2.");
@@ -85,23 +95,16 @@ export class MatrixGrid extends Component {
             .then(res => res.json());
     }
 
-    handleRowCount = (e) => {
-        this.setState({ row: e.target.value });
-    }
-
-    handleColCount = (e) => {
-        this.setState({ col: e.target.value });
+    handleRowColCount = (e) => {
+        this.setState({ row: e.target.value, col: e.target.value});
     }
 
     //demo
-    load() {
-        alert("Note - only full version allows you to load matrix from external source.");
+    handleFileData = (data, fileName) => {
+        var csvMatrix = this.mapStringToInt(data);
+        this.setState({ testMatrix: csvMatrix, loading: false });
+        this.post(this.state.testMatrix);
     }
-
-    export = () => {
-        //alert("Note - only full version allows you to export matrix data.");
-    }
-
 
     // service handlers
     buildRandomMatrix = (row, col) => {
@@ -117,6 +120,22 @@ export class MatrixGrid extends Component {
             }
         }
         return randomMatrix;
+    }
+
+    mapStringToInt = (data) => {
+        var csvMatrix = new Array(data.length);
+
+        for (let i = 0; i < data.length; i++) {
+            csvMatrix[i] = new Array(data.length);
+        }
+
+        for (let matrixRow = 0; matrixRow < data.length; matrixRow++) {
+            for (let matrixColumn = 0; matrixColumn < data.length; matrixColumn++) {
+                csvMatrix[matrixRow][matrixColumn] = parseInt(data[matrixRow][matrixColumn], 10);
+            };
+        }
+
+        return csvMatrix;
     }
 
     generateRandomNumber() {
